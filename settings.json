@@ -1,0 +1,20 @@
+{
+    "fbx" : {
+        "props" : {
+            "use_selection" : "True", 
+            "axis_forward" : "-Y", 
+            "axis_up" : "Z",
+            "add_leaf_bones" : "False", 
+            "bake_space_transform" : "False",  
+            "use_space_transform" : "True" 
+        },
+        "characters" : {
+                "use_selection" : "True", 
+                "axis_forward" : "-Z", 
+                "axis_up" : "Y",
+                "add_leaf_bones" : "False", 
+                "bake_space_transform" : "True",  
+                "use_space_transform" : "True" 
+            }
+        }
+}

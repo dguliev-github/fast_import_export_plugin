@@ -10,6 +10,7 @@ bl_info = {
     "category": "Import-Export"}
 
 import bpy
+import json
 
 
 class EXAMPLE_OT_something(bpy.types.Operator):

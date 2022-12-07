@@ -1,5 +1,5 @@
 bl_info = {
-    "name": "Export Header Button",
+    "name": "Fast Import Export",
     "author": "Damir Guliev, Robert Guetzkow",
     "version": (0, 0, 1),
     "blender": (3, 0, 0),
@@ -11,12 +11,21 @@ bl_info = {
 
 import bpy
 import json
+import os
 
+def set_settings(type, setup): #type = import, export; setup = props, characters
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    #TODO - add default settings.json generator
+    with open("settings.json") as settings_file:
+        settings = json.load(settings_file)
+    return dict(settings["fbx"][type][setup])
+
+fbx_export_settings = set_settings(type = "export",setup = "props")
 
 class EXAMPLE_OT_something(bpy.types.Operator):
     bl_idname = "example.something"
     bl_label = "Export"
-    bl_description = "This operator does something"
+    bl_description = "Export selected to the same file"
     bl_options = {"REGISTER"}
 
     def execute(self, context):
@@ -24,7 +33,11 @@ class EXAMPLE_OT_something(bpy.types.Operator):
             export_path = bpy.data.scenes['Scene']['export_path']
         except KeyError:
             pass
-        if export_path: 
+        if export_path:
+            #fix boolean and int conversion from json
+            
+            bpy.ops.export_scene.fbx(filepath = export_path, **fbx_export_settings) 
+            """
             bpy.ops.export_scene.fbx(
             filepath=export_path,
             use_selection = True, 
@@ -35,8 +48,9 @@ class EXAMPLE_OT_something(bpy.types.Operator):
             # global_scale=1, 
             # apply_unit_scale=True, 
             # apply_scale_options='FBX_SCALE_NONE', 
-            use_space_transform=True, 
-            #bake_space_transform=True, 
+            #use_space_transform=True,
+
+            bake_space_transform=True, 
             # object_types={'EMPTY', 'CAMERA', 'LIGHT', 'ARMATURE', 'MESH', 'OTHER'}, 
             # use_mesh_modifiers=True, 
             # use_mesh_modifiers_render=True, 
@@ -50,7 +64,7 @@ class EXAMPLE_OT_something(bpy.types.Operator):
             # primary_bone_axis='Y', 
             # secondary_bone_axis='X', 
             # use_armature_deform_only=False, 
-            # armature_nodetype='NULL', 
+            armature_nodetype="ROOT", 
             # bake_anim=True, 
             # bake_anim_use_all_bones=True, 
             # bake_anim_use_nla_strips=True, 
@@ -64,31 +78,42 @@ class EXAMPLE_OT_something(bpy.types.Operator):
             # use_batch_own_dir=True, 
             # use_metadata=True, 
             )
+            """
         return {"FINISHED"}
 
 
 def draw(self, context):
     self.layout.operator(EXAMPLE_OT_something.bl_idname)
 
-
 classes = (EXAMPLE_OT_something,)
-
 
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-        
     bpy.types.VIEW3D_HT_tool_header.prepend(draw)
 
-
 def unregister():
-    bpy.types.OUTLINER_HT_header.remove(draw)
-    
+    bpy.types.OUTLINER_HT_header.remove(draw)    
     for cls in classes:
         bpy.utils.unregister_class(cls)
 
+def importer():
+    from sys import argv
+    argv = argv[argv.index("--") + 1:]
+
+    import bpy
+    fbx_import_settings = set_settings(type = "import",setup = "standard") 
+    bpy.context.preferences.view.show_splash = False
+    for f in argv:
+        ext = os.path.splitext(f)[1].lower()
+
+        if ext == ".fbx":
+            bpy.ops.import_scene.fbx(filepath=f, **fbx_import_settings)
+        else:
+            print("Extension %r is not known!" % ext)
+        bpy.data.scenes['Scene']["export_path"] = str(argv[0])
+    if not argv:
+        print("No files passed")
 
 if __name__ == "__main__":
-    register()
-    
-# bpy.types.OUTLINER_HT_header.append(draw)
+    importer()

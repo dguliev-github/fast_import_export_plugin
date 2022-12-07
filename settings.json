@@ -1,20 +1,29 @@
 {
     "fbx" : {
-        "props" : {
-            "use_selection" : "True", 
-            "axis_forward" : "-Y", 
-            "axis_up" : "Z",
-            "add_leaf_bones" : "False", 
-            "bake_space_transform" : "False",  
-            "use_space_transform" : "True" 
+        "export": {
+            "props" : {
+                "use_selection" : true, 
+                "axis_forward" : "-Y", 
+                "axis_up" : "Z",
+                "add_leaf_bones" : false, 
+                "bake_space_transform" : false,  
+                "use_space_transform" : true 
+            },
+            "characters" : {
+                    "use_selection" : true, 
+                    "axis_forward" : "-Z", 
+                    "axis_up" : "Y",
+                    "add_leaf_bones" : false, 
+                    "bake_space_transform" : true,  
+                    "use_space_transform" : true 
+                }
         },
-        "characters" : {
-                "use_selection" : "True", 
-                "axis_forward" : "-Z", 
-                "axis_up" : "Y",
-                "add_leaf_bones" : "False", 
-                "bake_space_transform" : "True",  
-                "use_space_transform" : "True" 
+        "import" : {
+            "standard" : {
+                "ignore_leaf_bones" : false, 
+                "automatic_bone_orientation" : true
+                }
             }
+ 
         }
 }

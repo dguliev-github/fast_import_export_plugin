@@ -59,7 +59,7 @@
 				<key>ActionParameters</key>
 				<dict>
 					<key>COMMAND_STRING</key>
-					<string>importer_path="$HOME/Library/Application Support/Blender/3.3/scripts/addons/fast_import_export/import_os.py"
+					<string>importer_path="$HOME/Library/Application Support/Blender/3.3/scripts/addons/fast_import_export/__init__.py"
 # cd /Applications/Blender.app/Contents/MacOS
 open -n -a blender --args --python "$importer_path" -- "$1"</string>
 					<key>CheckedForUserDefaultShell</key>
@@ -171,12 +171,10 @@ open -n -a blender --args --python "$importer_path" -- "$1"</string>
 						<string>4</string>
 					</dict>
 				</dict>
-				<key>conversionLabel</key>
-				<integer>0</integer>
 				<key>isViewVisible</key>
 				<integer>1</integer>
 				<key>location</key>
-				<string>833.000000:432.000000</string>
+				<string>833.000000:252.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Run Shell Script.action/Contents/Resources/Base.lproj/main.nib</string>
 			</dict>

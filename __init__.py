@@ -13,6 +13,27 @@ import bpy
 import json
 import os
 
+def generate_blender_path(filename: str): # suggested to use "blender_executable_path.txt"
+    """
+    read the text file. if there is no file then make one, if contents is not bpy.app.binary_path when rewrite 
+    """
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    blender_executable_path = bpy.app.binary_path
+    '''
+    import addon_utils
+    
+    for mod in addon_utils.modules():
+        if mod.bl_info['name'] == "fast_export_import":
+            mod_filepath = os.path.dirname(mod.__file__)
+    
+    blender_executable_path_file = os.path.join(mod_filepath,filename)
+    '''
+    if os.path.exists(filename):
+        with open(filename,"r") as file:
+            if not (file.readline == blender_executable_path):
+                pass
+                
+    
 def set_settings(type, setup): #type = import, export; setup = props, characters
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     #TODO - add default settings.json generator
@@ -22,8 +43,8 @@ def set_settings(type, setup): #type = import, export; setup = props, characters
 
 fbx_export_settings = set_settings(type = "export",setup = "props")
 
-class EXAMPLE_OT_something(bpy.types.Operator):
-    bl_idname = "example.something"
+class FASTIO_OT_button(bpy.types.Operator):
+    bl_idname = "export.button"
     bl_label = "Export"
     bl_description = "Export selected to the same file"
     bl_options = {"REGISTER"}
@@ -83,9 +104,9 @@ class EXAMPLE_OT_something(bpy.types.Operator):
 
 
 def draw(self, context):
-    self.layout.operator(EXAMPLE_OT_something.bl_idname)
+    self.layout.operator(FASTIO_OT_button.bl_idname)
 
-classes = (EXAMPLE_OT_something,)
+classes = (FASTIO_OT_button,)
 
 def register():
     for cls in classes:

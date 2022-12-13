@@ -29,9 +29,15 @@ def generate_blender_path(filename: str): # suggested to use "blender_executable
     blender_executable_path_file = os.path.join(mod_filepath,filename)
     '''
     if os.path.exists(filename):
-        with open(filename,"r") as file:
+        with open(filename,"r+") as file:
             if not (file.readline == blender_executable_path):
+                file.write(blender_executable_path)
+            else:
                 pass
+    else:
+        with open(filename,"x") as file:
+            file.write(blender_executable_path)
+            
                 
     
 def set_settings(type, setup): #type = import, export; setup = props, characters
@@ -42,7 +48,7 @@ def set_settings(type, setup): #type = import, export; setup = props, characters
     return dict(settings["fbx"][type][setup])
 
 fbx_export_settings = set_settings(type = "export",setup = "props")
-
+generate_blender_path("blender_executable_path.txt")
 class FASTIO_OT_button(bpy.types.Operator):
     bl_idname = "export.button"
     bl_label = "Export"

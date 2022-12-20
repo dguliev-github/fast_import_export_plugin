@@ -1,3 +1,6 @@
+# https://docs.blender.org/api/current/bpy.types.Operator.html
+# https://blenderartists.org/t/do-all-buttons-on-a-menu-need-to-be-an-operator/1253523
+
 bl_info = {
     "name": "Fast Import Export",
     "author": "Damir Guliev, Robert Guetzkow",
@@ -19,15 +22,7 @@ def generate_blender_path(filename: str): # suggested to use "blender_executable
     """
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     blender_executable_path = bpy.app.binary_path
-    '''
-    import addon_utils
-    
-    for mod in addon_utils.modules():
-        if mod.bl_info['name'] == "fast_export_import":
-            mod_filepath = os.path.dirname(mod.__file__)
-    
-    blender_executable_path_file = os.path.join(mod_filepath,filename)
-    '''
+
     if os.path.exists(filename):
         with open(filename,"r+") as file:
             if not (file.readline == blender_executable_path):
@@ -60,59 +55,27 @@ class FASTIO_OT_button(bpy.types.Operator):
             export_path = bpy.data.scenes['Scene']['export_path']
         except KeyError:
             pass
-        if export_path:
-            #fix boolean and int conversion from json
-            
+        if export_path:       
             bpy.ops.export_scene.fbx(filepath = export_path, **fbx_export_settings) 
-            """
-            bpy.ops.export_scene.fbx(
-            filepath=export_path,
-            use_selection = True, 
-            axis_forward = '-Y', 
-            axis_up = 'Z',
-            # use_visible=False, 
-            # use_active_collection=False, 
-            # global_scale=1, 
-            # apply_unit_scale=True, 
-            # apply_scale_options='FBX_SCALE_NONE', 
-            #use_space_transform=True,
+        return {"FINISHED"}
+        
+class FASTIO_OT_settings(bpy.types.Operator):
+    bl_idname = "export.settings"
+    bl_label = "Export"
+    bl_description = "Currently does nothing"
+    bl_options = {"REGISTER"}
 
-            bake_space_transform=True, 
-            # object_types={'EMPTY', 'CAMERA', 'LIGHT', 'ARMATURE', 'MESH', 'OTHER'}, 
-            # use_mesh_modifiers=True, 
-            # use_mesh_modifiers_render=True, 
-            # mesh_smooth_type='OFF', 
-            # use_subsurf=False, 
-            # use_mesh_edges=False, 
-            # use_tspace=False, 
-            # use_triangles=False, 
-            # use_custom_props=False, 
-            add_leaf_bones=False, 
-            # primary_bone_axis='Y', 
-            # secondary_bone_axis='X', 
-            # use_armature_deform_only=False, 
-            armature_nodetype="ROOT", 
-            # bake_anim=True, 
-            # bake_anim_use_all_bones=True, 
-            # bake_anim_use_nla_strips=True, 
-            # bake_anim_use_all_actions=True, 
-            # bake_anim_force_startend_keying=True, 
-            # bake_anim_step=1, 
-            # bake_anim_simplify_factor=1, 
-            # path_mode='AUTO', 
-            # embed_textures=False, 
-            # batch_mode='OFF', 
-            # use_batch_own_dir=True, 
-            # use_metadata=True, 
-            )
-            """
+    def execute(self, context):
         return {"FINISHED"}
 
 
 def draw(self, context):
-    self.layout.operator(FASTIO_OT_button.bl_idname)
+    layout = self.layout
+    row = layout.row(align=True)
+    row.operator(FASTIO_OT_button.bl_idname, icon = "EXPORT")
+    row.operator(FASTIO_OT_settings.bl_idname, text = "" , icon = "PREFERENCES")
 
-classes = (FASTIO_OT_button,)
+classes = (FASTIO_OT_button,FASTIO_OT_settings)
 
 def register():
     for cls in classes:

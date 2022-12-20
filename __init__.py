@@ -50,13 +50,18 @@ class FASTIO_OT_button(bpy.types.Operator):
     bl_description = "Export selected to the same file"
     bl_options = {"REGISTER"}
 
+    @classmethod
+    def poll(cls, context):
+        return context.active_object is not None
+
     def execute(self, context):
+        export_path = ""
         try:
             export_path = bpy.data.scenes['Scene']['export_path']
         except KeyError:
-            pass
-        if export_path:       
-            bpy.ops.export_scene.fbx(filepath = export_path, **fbx_export_settings) 
+            bpy.ops.export_scene.fbx('INVOKE_DEFAULT', **fbx_export_settings)
+        else:
+            bpy.ops.export_scene.fbx(filepath = export_path, **fbx_export_settings)
         return {"FINISHED"}
         
 class FASTIO_OT_settings(bpy.types.Operator):

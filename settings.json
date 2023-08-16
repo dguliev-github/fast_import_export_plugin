@@ -1,30 +1,38 @@
 {
-    "fbx" : {
+    "fbx": {
         "export": {
-            "props" : {
-                "use_selection" : true, 
-                "axis_forward" : "-Y", 
-                "axis_up" : "Z",
-                "add_leaf_bones" : false, 
-                "bake_space_transform" : false,  
-                "use_space_transform" : true,
-                "apply_scale_options" : "FBX_SCALE_UNITS"
+            "props": {
+                "use_selection": true,
+                "axis_forward": "-X",
+                "axis_up": "Z",
+                "add_leaf_bones": false,
+                "bake_space_transform": true,
+                "use_space_transform": true
             },
-            "characters" : {
-                    "use_selection" : true, 
-                    "axis_forward" : "-Z", 
-                    "axis_up" : "Y",
-                    "add_leaf_bones" : false, 
-                    "bake_space_transform" : true,  
-                    "use_space_transform" : true 
-                }
-        },
-        "import" : {
-            "standard" : {
-                "ignore_leaf_bones" : false, 
-                "automatic_bone_orientation" : true
-                }
+            "characters": {
+                "use_selection": true,
+                "axis_forward": "-Z",
+                "axis_up": "Y",
+                "add_leaf_bones": false,
+                "bake_space_transform": true,
+                "use_space_transform": true
+            },
+            "compliance": {
+                "use_selection": true,
+                "axis_forward": "-X",
+                "axis_up": "Z",
+                "add_leaf_bones": false,
+                "bake_space_transform": false,
+                "use_space_transform": true,
+                "apply_scale_options": "FBX_SCALE_ALL"
             }
- 
+        },
+        "import": {
+            "standard": {
+                "ignore_leaf_bones": false,
+                "automatic_bone_orientation": true
+            },
+            "default": {}
         }
+    }
 }

@@ -46,15 +46,10 @@ def set_settings(type, setup): #type = import, export; setup = props, characters
         settings = json.load(settings_file)
     return dict(settings["fbx"][type][setup])
 
-
-class addCubeSamplePreferences(bpy.types.AddonPreferences):
-    bl_idname = __package__
-
 addon_dir = os.path.dirname(os.path.abspath(__file__))
-
-fbx_export_settings = set_settings(type = "export",setup = "props")
-
+default_export_preset = "compliance" #TODO fix hardcoded value
 generate_executable_bat(os.path.split(bpy.app.binary_path)[0], bpy.app.binary_path, addon_dir, "blender_to_os.bat")
+
 class FASTIO_OT_button(bpy.types.Operator):
     bl_idname = "export.button"
     bl_label = "Export"
@@ -68,6 +63,10 @@ class FASTIO_OT_button(bpy.types.Operator):
     def execute(self, context):
         export_path = ""
         try:
+            fbx_export_settings = set_settings(type="export",setup=bpy.data.scenes['Scene']["export_preset"])
+        except AttributeError:
+            fbx_export_settings = set_settings(type = "export",setup = default_export_preset)
+        try:
             export_path = bpy.data.scenes['Scene']['export_path']
         except KeyError:
             bpy.ops.export_scene.fbx('INVOKE_DEFAULT', **fbx_export_settings)
@@ -78,11 +77,28 @@ class FASTIO_OT_button(bpy.types.Operator):
 class FASTIO_OT_settings(bpy.types.Operator):
     bl_idname = "export.settings"
     bl_label = "Export"
-    bl_description = "Currently does nothing"
-    bl_options = {"REGISTER"}
+    bl_description = "Select Export Preset"
+    bl_options = {"REGISTER", "UNDO"}
+    # TODO read presets from json. Change json structure so it would contain names and descriptions
+    preset_items = [
+        ("characters", "Characters", "Export preset for characters"),
+        ("props", "Props", "Export preset for props"),
+        ("compliance", "Compliance", "Export preset for compliance"),
+    ]
+
+    preset_name: bpy.props.EnumProperty(
+        items=preset_items,
+        name="Export Preset",
+        description="Select an export preset",
+    )
 
     def execute(self, context):
+        bpy.data.scenes['Scene']["export_preset"] = self.preset_name
         return {"FINISHED"}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_popup(self, event)
+
 
 
 def draw(self, context):
@@ -137,6 +153,7 @@ def importer():
         else:
             print("Extension %r is not known!" % ext)
         bpy.data.scenes['Scene']["export_path"] = str(argv[0])
+        bpy.data.scenes['Scene']["export_preset"] = default_export_preset 
     if not argv:
         print("No files passed")
 

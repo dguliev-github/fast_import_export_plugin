@@ -1,4 +1,5 @@
-:: TODO - generate blender executable path, save it, and read it from the file
-pushd "C:\Users\DG\AppData\Roaming\Blender Foundation\Blender\builds\stable\blender-3.3.2+lts.bf24652e38a2\"
+
+@echo off
+pushd "C:\Users\DG\AppData\Roaming\Blender Foundation\Blender\builds\stable\blender-3.6.1+stable.8bda729ef4dc\"
 popd
-"C:\Users\DG\AppData\Roaming\Blender Foundation\Blender\builds\stable\blender-3.3.2+lts.bf24652e38a2\blender.exe" --python "C:\Sync\Blender\current_addons\addons\fast_export_import\__init__.py" -- %1
+"C:\Users\DG\AppData\Roaming\Blender Foundation\Blender\builds\stable\blender-3.6.1+stable.8bda729ef4dc\blender.exe" --python "C:\Sync\Blender\current_addons\addons\fast_export_import\__init__.py" -- %1

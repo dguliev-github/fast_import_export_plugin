@@ -1,40 +1,44 @@
 # https://docs.blender.org/api/current/bpy.types.Operator.html
 # https://blenderartists.org/t/do-all-buttons-on-a-menu-need-to-be-an-operator/1253523
+# https://blender.stackexchange.com/questions/32036/is-it-possible-to-associate-non-blend-files-with-blender
 
 bl_info = {
     "name": "Fast Import Export",
-    "author": "Damir Guliev, Robert Guetzkow",
-    "version": (0, 0, 1),
+    "author": "Damir Guliev, Robert Guetzkow, Campbell Barton (ideasman42)",
+    "version": (0, 0, 2),
     "blender": (3, 0, 0),
     "location": "3D View",
     "description": "Adds an export button to the 3D menu header.",
     "wiki_url": "",
-    "warning": "Variables are hardcoded!",
+    "warning": "Some variables are still hardcoded!",
     "category": "Import-Export"}
 
 import bpy
 import json
 import os
 
-def generate_blender_path(filename: str): # suggested to use "blender_executable_path.txt"
-    """
-    read the text file. if there is no file then make one, if contents is not bpy.app.binary_path when rewrite 
-    """
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    blender_executable_path = bpy.app.binary_path
-
-    if os.path.exists(filename):
-        with open(filename,"r+") as file:
-            if not (file.readline == blender_executable_path):
-                file.write(blender_executable_path)
-            else:
-                pass
-    else:
-        with open(filename,"x") as file:
-            file.write(blender_executable_path)
-            
-                
+def generate_executable_bat(blender_work_path, blender_exe_path, addon_path, executable_bat_path):
+    new_content = \
+f"""
+@echo off
+pushd "{blender_work_path}\\"
+popd
+"{blender_exe_path}" --python "{addon_path}\__init__.py" -- %1
+"""
     
+    # Check if the file already exists
+    if os.path.exists(executable_bat_path):
+        with open(executable_bat_path, 'r') as existing_file:
+            existing_content = existing_file.read()
+            
+        # Compare existing content with new content
+        if existing_content == new_content:
+            return
+    
+    # Write new content to the file
+    with open(executable_bat_path, 'w') as file:
+        file.write(new_content)
+            
 def set_settings(type, setup): #type = import, export; setup = props, characters
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     #TODO - add default settings.json generator
@@ -42,8 +46,15 @@ def set_settings(type, setup): #type = import, export; setup = props, characters
         settings = json.load(settings_file)
     return dict(settings["fbx"][type][setup])
 
+
+class addCubeSamplePreferences(bpy.types.AddonPreferences):
+    bl_idname = __package__
+
+addon_dir = os.path.dirname(os.path.abspath(__file__))
+
 fbx_export_settings = set_settings(type = "export",setup = "props")
-generate_blender_path("blender_executable_path.txt")
+
+generate_executable_bat(os.path.split(bpy.app.binary_path)[0], bpy.app.binary_path, addon_dir, "blender_to_os.bat")
 class FASTIO_OT_button(bpy.types.Operator):
     bl_idname = "export.button"
     bl_label = "Export"
@@ -80,7 +91,27 @@ def draw(self, context):
     row.operator(FASTIO_OT_button.bl_idname, icon = "EXPORT")
     row.operator(FASTIO_OT_settings.bl_idname, text = "" , icon = "PREFERENCES")
 
-classes = (FASTIO_OT_button,FASTIO_OT_settings)
+class AddFolderPreferences(bpy.types.AddonPreferences):
+    bl_idname = __name__
+
+    def draw(self, context):
+        layout = self.layout
+        # layout.label(text="Addon Preferences")
+
+        row = layout.row()
+        # row.label(text="Addon Folder:")
+        row.operator("addon.open_folder", text="Open Addon Folder")
+
+class OpenFolderOperator(bpy.types.Operator):
+    bl_idname = "addon.open_folder"
+    bl_label = "Open Addon Folder"
+
+    def execute(self, context):
+        addon_dir = os.path.dirname(os.path.abspath(__file__))
+        os.system(f'explorer.exe "{addon_dir}"')
+        return {'FINISHED'}
+
+classes = (FASTIO_OT_button,FASTIO_OT_settings,AddFolderPreferences,OpenFolderOperator)
 
 def register():
     for cls in classes:
@@ -96,7 +127,6 @@ def importer():
     from sys import argv
     argv = argv[argv.index("--") + 1:]
 
-    import bpy
     fbx_import_settings = set_settings(type = "import",setup = "standard") 
     bpy.context.preferences.view.show_splash = False
     for f in argv:

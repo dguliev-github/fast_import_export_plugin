@@ -7,7 +7,8 @@
                 "axis_up" : "Z",
                 "add_leaf_bones" : false, 
                 "bake_space_transform" : false,  
-                "use_space_transform" : true 
+                "use_space_transform" : true,
+                "apply_scale_options" : "FBX_SCALE_UNITS"
             },
             "characters" : {
                     "use_selection" : true, 

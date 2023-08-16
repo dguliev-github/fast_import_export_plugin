@@ -25,7 +25,7 @@ pushd "{blender_work_path}\\"
 popd
 "{blender_exe_path}" --python "{addon_path}\__init__.py" -- %1
 """
-    
+    executable_bat_path = addon_path + "\\" + executable_bat_path
     # Check if the file already exists
     if os.path.exists(executable_bat_path):
         with open(executable_bat_path, 'r') as existing_file:
@@ -36,9 +36,9 @@ popd
             return
     
     # Write new content to the file
-    with open(executable_bat_path, 'w') as file:
+    with open(executable_bat_path, 'w+') as file:
         file.write(new_content)
-            
+
 def set_settings(type, setup): #type = import, export; setup = props, characters
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     #TODO - add default settings.json generator

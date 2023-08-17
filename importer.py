@@ -21,7 +21,13 @@ def import_file():
     for f in argv:
         ext = os.path.splitext(f)[1].lower()
         if ext == ".fbx":
-            bpy.ops.import_scene.fbx(filepath=f, **fbx_import_settings)
+            try:
+                bpy.ops.import_scene.fbx(filepath=f, **fbx_import_settings)
+            except RuntimeError:
+                if 'better_fbx' in [addon.module for addon in bpy.context.preferences.addons]:
+                    bpy.ops.better_import.fbx(filepath=f, my_rotation_mode='XYZ', my_fbx_unit='m', use_reset_mesh_origin=False, use_reset_mesh_rotation=False)
+                else:
+                    raise RuntimeError("Attempted to open ASCII FBX without Better Fbx Importer")   
         else:
             print("Extension %r is not known!" % ext)
         bpy.data.scenes['Scene']["export_path"] = str(argv[0])

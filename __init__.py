@@ -19,7 +19,7 @@ import os
 
 def generate_executable_bat(blender_work_path, blender_exe_path, addon_path, executable_bat_path):
     new_content = \
-f"""
+f"""\
 @echo off
 pushd "{blender_work_path}\\"
 popd

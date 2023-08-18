@@ -163,3 +163,6 @@ target/
 # IPython
 profile_default/
 ipython_config.py
+
+# Executables
+blender_to_os.bat

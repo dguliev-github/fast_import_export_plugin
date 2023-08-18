@@ -17,6 +17,7 @@ import bpy
 import json
 import os
 
+
 def generate_executable_bat(blender_work_path, blender_exe_path, addon_path, executable_bat_path):
     new_content = \
 f"""\
@@ -41,13 +42,13 @@ popd
 
 def set_settings(type, setup): #type = import, export; setup = props, characters
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    #TODO - add default settings.json generator
+    # TODO - add default settings.json generator
     with open("settings.json") as settings_file:
         settings = json.load(settings_file)
     return dict(settings["fbx"][type][setup])
 
 addon_dir = os.path.dirname(os.path.abspath(__file__))
-default_export_preset = "compliance" #TODO fix hardcoded value
+default_export_preset = "compliance"  #TODO fix hardcoded value
 generate_executable_bat(os.path.split(bpy.app.binary_path)[0], bpy.app.binary_path, addon_dir, "blender_to_os.bat")
 
 class FASTIO_OT_button(bpy.types.Operator):
@@ -63,9 +64,9 @@ class FASTIO_OT_button(bpy.types.Operator):
     def execute(self, context):
         export_path = ""
         try:
-            fbx_export_settings = set_settings(type="export",setup=bpy.data.scenes['Scene']["export_preset"])
+            fbx_export_settings = set_settings(type="export", setup=bpy.data.scenes['Scene']["export_preset"])
         except AttributeError:
-            fbx_export_settings = set_settings(type = "export",setup = default_export_preset)
+            fbx_export_settings = set_settings(type = "export", setup = default_export_preset)
         try:
             export_path = bpy.data.scenes['Scene']['export_path']
         except KeyError:
@@ -87,8 +88,8 @@ class FASTIO_OT_settings(bpy.types.Operator):
     ]
 
     preset_name: bpy.props.EnumProperty(
-        items=preset_items,
-        name="Export Preset",
+        items = preset_items,
+        name = "Export Preset",
         description="Select an export preset",
     )
 
@@ -98,7 +99,6 @@ class FASTIO_OT_settings(bpy.types.Operator):
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_popup(self, event)
-
 
 
 def draw(self, context):
@@ -123,21 +123,23 @@ class OpenFolderOperator(bpy.types.Operator):
     bl_label = "Open Addon Folder"
 
     def execute(self, context):
-        addon_dir = os.path.dirname(os.path.abspath(__file__))
         os.system(f'explorer.exe "{addon_dir}"')
         return {'FINISHED'}
 
 classes = (FASTIO_OT_button,FASTIO_OT_settings,AddFolderPreferences,OpenFolderOperator)
+
 
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
     bpy.types.VIEW3D_HT_tool_header.prepend(draw)
 
+
 def unregister():
     bpy.types.OUTLINER_HT_header.remove(draw)    
     for cls in classes:
         bpy.utils.unregister_class(cls)
+
 
 def importer():
     from sys import argv
@@ -147,15 +149,21 @@ def importer():
     bpy.context.preferences.view.show_splash = False
     for f in argv:
         ext = os.path.splitext(f)[1].lower()
-
         if ext == ".fbx":
-            bpy.ops.import_scene.fbx(filepath=f, **fbx_import_settings)
+            try:
+                bpy.ops.import_scene.fbx(filepath=f, **fbx_import_settings)
+            except RuntimeError:
+                if 'better_fbx' in [addon.module for addon in bpy.context.preferences.addons]:
+                    bpy.ops.better_import.fbx(filepath=f, my_rotation_mode='XYZ', my_fbx_unit='m', use_reset_mesh_origin=False, use_reset_mesh_rotation=False)
+                else:
+                    raise RuntimeError("Attempted to open ASCII FBX without Better Fbx Importer")   
         else:
             print("Extension %r is not known!" % ext)
         bpy.data.scenes['Scene']["export_path"] = str(argv[0])
         bpy.data.scenes['Scene']["export_preset"] = default_export_preset 
     if not argv:
         print("No files passed")
+
 
 if __name__ == "__main__":
     importer()
